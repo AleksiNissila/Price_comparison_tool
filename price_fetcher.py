@@ -67,5 +67,7 @@ class Steam:
         }
         r = requests.get(URL, params=params).json()
 
-        priceEUR = r["lowest_price"]
+        priceEUR = str(r["lowest_price"])
+        priceEUR = priceEUR.replace(',', '.').replace('-', '0')
+        print(priceEUR)
         return priceEUR

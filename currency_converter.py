@@ -70,3 +70,14 @@ def convert_value(value, fromRate, toRate):
     else:
         return None
     return converted_value
+
+def calculate_difference(steam_val, buff_val):
+
+    steam_val, buff_val = float(steam_val), float(buff_val)
+    eur_diff = steam_val - buff_val
+    percentage_diff = (eur_diff / steam_val) * 100
+    percentage_diff = -percentage_diff
+    eur_diff = round(eur_diff, 1)
+    percentage_diff = round(percentage_diff, 1)
+
+    return str(eur_diff), str(percentage_diff)

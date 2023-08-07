@@ -1,6 +1,8 @@
 import tkinter
 import tkinter as tk
 import csv
+
+import currency_converter
 import price_fetcher
 
 # LOGIIKKA (ESIM SELECTED ITEM) TULISI VARMAAN SIIRTÄÄ MUUALLE. REFAKTOROINTI VOISI MYÖS OLLA HYVÄ SITEN, ETTÄ OLISI SELKEÄMPI RAKENNE
@@ -26,7 +28,7 @@ class App(tk.Tk):
         self.grid_rowconfigure(0, weight=0)
         self.grid_rowconfigure(1, weight=1)
         self.grid_rowconfigure(2, weight=0)
-
+        self.geometry("1280x720")
 
 
         addButton = tk.Button(self, text="Get item", command=self.selected_item)
@@ -97,15 +99,24 @@ class App(tk.Tk):
 
 
     def create_singleitem_grid(self, buff_name, buff_price, steam_price):
+        buff_to_eur = currency_converter.convert_value(buff_price, "CNY", "EUR")
+        eur_diff, percentage_diff = currency_converter.calculate_difference(steam_price, buff_to_eur)
+
+        buff_price += "¥ (" + str(buff_to_eur) + " €)"
+        steam_price += " €"
+        diff_price = "Difference in price: " + eur_diff + " € (" + percentage_diff + " %)"
+
         name_label = tk.Label(self.item_frame, text=buff_name)
         buff_label = tk.Label(self.item_frame, text=buff_price)
         steam_label = tk.Label(self.item_frame, text=steam_price)
+        diff_label = tk.Label(self.item_frame, text=diff_price)
 
-        new_row_index = self.item_frame.grid_size()[1]
+        new_row_index = self.item_frame.grid_size()[1] * 2
 
-        name_label.grid(column=0, row=new_row_index)
-        buff_label.grid(column=1, row=new_row_index)
+        name_label.grid(column=1, row=new_row_index)
+        buff_label.grid(column=2, row=new_row_index+1)
         steam_label.grid(column=2, row=new_row_index)
+        diff_label.grid(column=1, row=new_row_index+1)
 
         self.update()
 
