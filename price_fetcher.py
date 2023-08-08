@@ -35,24 +35,17 @@ class Buff:
             }
             r = requests.get(URL, params=params, headers=self.header).json()
 
-
-            # Some search terms include both normal and
-            # Stat-Trak version of the weapon.
-            # This check makes sure that the search term and the found item match
-            # (Because searching for non-stattrak weapon
-            # might return the stattrak version otherwise)
-            # TODO change this to a loop to find the wanted item.
-            # Search terms such as "★ Ursus Knife" can cause problems because it returns
-            # all ursus knife skins.
-            name = r["data"]["items"][0]["name"]
-            if name != itemname:
-                name = r["data"]["items"][1]["name"]
-                priceCNY = r["data"]["items"][1]["sell_min_price"]
-            else:
-                priceCNY = r["data"]["items"][0]["sell_min_price"]
+            name = ""
+            priceCNY = 0
+            i = 0
+            while name != itemname:
+                name = r["data"]["items"][i]["name"]
+                priceCNY = r["data"]["items"][i]["sell_min_price"]
+                i += 1
+            i -= 1
 
             # Get an image for the found item
-            image = self.getItemImage(r)
+            image = self.getItemImage(r, i)
 
             # This could use a better way, since the image is gotten from "getPrice" atm
             return name, priceCNY, image
@@ -60,12 +53,12 @@ class Buff:
             print("Could not find data from Buff. (Try setting the cookies again)")
             return "noname", 0
 
-    def getItemImage(self, r):
-        img_url = r["data"]["items"][0]["goods_info"]["original_icon_url"]
+    def getItemImage(self, r, i):
+        img_url = r["data"]["items"][i]["goods_info"]["original_icon_url"]
         response = requests.get(img_url)
         print(img_url)
         image = Image.open(BytesIO(response.content))
-        image.thumbnail((100, 100), Image.ANTIALIAS)
+        image.thumbnail((150, 150), Image.ANTIALIAS)
         image = ImageTk.PhotoImage(image)
         return image
 
@@ -83,6 +76,6 @@ class Steam:
         r = requests.get(URL, params=params).json()
 
         priceEUR = str(r["lowest_price"])
-        priceEUR = priceEUR.replace(',', '.').replace('-', '0')
+        priceEUR = priceEUR.replace(',', '.',).replace('-', '0',).replace(' ', '')
         print(priceEUR)
         return priceEUR
