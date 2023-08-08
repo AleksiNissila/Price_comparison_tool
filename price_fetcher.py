@@ -3,6 +3,8 @@
 import requests
 import currency_converter
 import json
+from PIL import Image, ImageTk
+from io import BytesIO
 
 with open("config.json", "r") as f:
     config = json.load(f)
@@ -13,9 +15,9 @@ class Price:
         self.steam = Steam()
 
     def fetch_price(self, itemname):
-        buff_name, buff_price = self.buff.getBuffPrice(itemname)
+        buff_name, buff_price, image = self.buff.getBuffPrice(itemname)
         steam_price = self.steam.getSteamPrice(itemname)[:-1]
-        return buff_name, buff_price, steam_price
+        return buff_name, buff_price, steam_price, image
 
 
 class Buff:
@@ -32,7 +34,7 @@ class Buff:
                 "search" : str(itemname)
             }
             r = requests.get(URL, params=params, headers=self.header).json()
-            print(r)
+
 
             # Some search terms include both normal and
             # Stat-Trak version of the weapon.
@@ -49,10 +51,23 @@ class Buff:
             else:
                 priceCNY = r["data"]["items"][0]["sell_min_price"]
 
-            return name, priceCNY
+            # Get an image for the found item
+            image = self.getItemImage(r)
+
+            # This could use a better way, since the image is gotten from "getPrice" atm
+            return name, priceCNY, image
         except KeyError:
             print("Could not find data from Buff. (Try setting the cookies again)")
             return "noname", 0
+
+    def getItemImage(self, r):
+        img_url = r["data"]["items"][0]["goods_info"]["original_icon_url"]
+        response = requests.get(img_url)
+        print(img_url)
+        image = Image.open(BytesIO(response.content))
+        image.thumbnail((100, 100), Image.ANTIALIAS)
+        image = ImageTk.PhotoImage(image)
+        return image
 
 
 
