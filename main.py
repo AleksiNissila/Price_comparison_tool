@@ -1,5 +1,5 @@
 import gui
-import price_fetcher
+import api_fetcher
 
 App = gui.App()
 App.mainloop()

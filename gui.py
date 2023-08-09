@@ -2,20 +2,9 @@ import tkinter as tk
 import csv
 
 import currency_converter
-import price_fetcher
-from PIL import Image, ImageTk
+import api_fetcher
 
-# LOGIIKKA (ESIM SELECTED ITEM) TULISI VARMAAN SIIRTÄÄ MUUALLE. REFAKTOROINTI VOISI MYÖS OLLA HYVÄ SITEN, ETTÄ OLISI SELKEÄMPI RAKENNE
-# ESIM OMA FILE INPOUT SIVUN RAKENNUKSELLE. EHKÄ OMA FILE SEN LOGIIKALLE?
-# API PULLERIT TULISI MYÖS TOTEUTTAA JOTENKIN JÄRKEVÄSTI, CLASSINA TMS
-# PITÄISI MYÖS OLLA INIT SIVU KOKO OHJELMALLE, SITEN ETTÄ OLIOT SUN MUUT LUODAAN KERRALLA
-# TODO MYÖS TARKISTAA ETTÄ BUFF TUOTE ON OIKEA. ESIM KUN HAKEE PUUKKOA NIIN VOI TULLA STATTRAK EKANA
-# TODO price fetcher pitää siirtää muualle. Ehkä logiikkaan. Mainista sitä ei saa
-# helposti haettua
-
-
-
-price_fetcher = price_fetcher.Price()
+price_fetcher = api_fetcher.Price()
 
 class App(tk.Tk):
     def __init__(self):
@@ -28,7 +17,7 @@ class App(tk.Tk):
         self.grid_rowconfigure(0, weight=0)
         self.grid_rowconfigure(1, weight=1)
         self.grid_rowconfigure(2, weight=0)
-        self.geometry("1280x720")
+        self.geometry("1024x576")
 
 
         addButton = tk.Button(self, text="Get item", command=self.selected_item)
@@ -38,8 +27,10 @@ class App(tk.Tk):
         self.init_item_listbox()
 
         self.item_frame = tk.Frame(self)
-        self.item_frame.grid(row=1, column=0)
+        self.item_frame.grid(row=1, column=0, sticky='nwe')
         self.item_frame.configure(height=45, width=90)
+        self.item_frame.columnconfigure(index=1, weight=1)
+        self.item_frame.columnconfigure(index=2, weight=2)
 
 
         # The initial update.
@@ -101,24 +92,33 @@ class App(tk.Tk):
     def create_singleitem_grid(self, buff_name, buff_price, steam_price, image):
         buff_to_eur = currency_converter.convert_value(buff_price, "CNY", "EUR")
         eur_diff, percentage_diff = currency_converter.calculate_difference(steam_price, buff_to_eur)
+        if float(eur_diff) <= 0:
+            col = "red"
+        else:
+            col = "green"
+
 
         buff_price += "¥ (" + str(buff_to_eur) + " €)"
         steam_price += " €"
         diff_price = "Difference in price: " + eur_diff + " € (" + percentage_diff + " %)"
 
-        name_label = tk.Label(self.item_frame, text=buff_name)
-        buff_label = tk.Label(self.item_frame, text=buff_price)
-        steam_label = tk.Label(self.item_frame, text=steam_price)
-        diff_label = tk.Label(self.item_frame, text=diff_price)
+        name_label = tk.Label(self.item_frame, text=buff_name, font=("Arial", 12))
+        buff_label = tk.Label(self.item_frame, text=buff_price, font=("Arial", 12))
+        steam_label = tk.Label(self.item_frame, text=steam_price, font=("Arial", 12))
+        diff_label = tk.Label(self.item_frame, text=diff_price, fg=col, font=("Arial", 12))
         image_label = tk.Label(self.item_frame, image=image)
         image_label.image = image
 
         new_row_index = self.item_frame.grid_size()[1] * 2
-
-        name_label.grid(column=1, row=new_row_index)
-        buff_label.grid(column=2, row=new_row_index+1)
-        steam_label.grid(column=2, row=new_row_index)
-        diff_label.grid(column=1, row=new_row_index+1)
+        name_label.grid(column=1, row=new_row_index, sticky="w")
+        buff_label.grid(column=2, row=new_row_index+1, sticky="w")
+        steam_label.grid(column=2, row=new_row_index, sticky="w")
+        diff_label.grid(column=1, row=new_row_index+1, sticky="w")
         image_label.grid(column=0, row=new_row_index, rowspan=2)
 
         self.update()
+
+# TODO viivat tai vastaavat kenttien välille
+# TODO clear-nappi joka tyhjentää gridin
+# TODO scrollwheeli vasemmalle jos mahdollista
+
