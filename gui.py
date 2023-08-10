@@ -19,19 +19,12 @@ class App(tk.Tk):
         self.grid_rowconfigure(2, weight=0)
         self.geometry("1024x576")
 
-
         addButton = tk.Button(self, text="Get item", command=self.selected_item)
         addButton.grid(row=2, column=1, sticky='se')
 
         self.create_skinlist()
         self.init_item_listbox()
-
-        self.item_frame = tk.Frame(self)
-        self.item_frame.grid(row=1, column=0, sticky='nwe')
-        self.item_frame.configure(height=45, width=90)
-        self.item_frame.columnconfigure(index=1, weight=1)
-        self.item_frame.columnconfigure(index=2, weight=2)
-
+        self.create_item_frame()
 
         # The initial update.
         self.on_tick()
@@ -77,6 +70,7 @@ class App(tk.Tk):
 
         self.after(250, self.on_tick)
 
+
     def selected_item(self):
         if (self.listbox.curselection()):
 
@@ -88,6 +82,18 @@ class App(tk.Tk):
             print("steam price:", steam_price)
             self.create_singleitem_grid(buff_name, buff_price, steam_price, image)
 
+    def create_item_frame(self):
+        self.item_frame = tk.Frame(self)
+        self.item_frame.grid(row=1, column=0, sticky='nwe')
+        self.item_frame.configure(height=45, width=90)
+        self.item_frame.columnconfigure(index=1, weight=1)
+        self.item_frame.columnconfigure(index=2, weight=2)
+        clear_button = tk.Button(self, text="Clear items", command=self.clear_items)
+        clear_button.grid(row=2, column=0, sticky="w")
+
+    def clear_items(self):
+        for widget in self.item_frame.winfo_children():
+            widget.destroy()
 
     def create_singleitem_grid(self, buff_name, buff_price, steam_price, image):
         buff_to_eur = currency_converter.convert_value(buff_price, "CNY", "EUR")
