@@ -84,8 +84,7 @@ class App(tk.Tk):
 
     def create_item_frame(self):
         self.item_frame = tk.Frame(self)
-        self.item_frame.grid(row=1, column=0, sticky='nwe')
-        self.item_frame.configure(height=45, width=90)
+        self.item_frame.grid(row=0, rowspan=2, column=0, sticky='nwe')
         self.item_frame.columnconfigure(index=1, weight=1)
         self.item_frame.columnconfigure(index=2, weight=2)
         clear_button = tk.Button(self, text="Clear items", command=self.clear_items)
@@ -104,27 +103,36 @@ class App(tk.Tk):
             col = "green"
 
 
-        buff_price += "¥ (" + str(buff_to_eur) + " €)"
-        steam_price += " €"
+        buff_price = "Price in Buff: " + buff_price + " ¥ (" + str(buff_to_eur) + " €)"
+        steam_price = "Price in Steam: " + steam_price + "€"
         diff_price = "Difference in price: " + eur_diff + " € (" + percentage_diff + " %)"
 
-        name_label = tk.Label(self.item_frame, text=buff_name, font=("Arial", 12))
-        buff_label = tk.Label(self.item_frame, text=buff_price, font=("Arial", 12))
-        steam_label = tk.Label(self.item_frame, text=steam_price, font=("Arial", 12))
-        diff_label = tk.Label(self.item_frame, text=diff_price, fg=col, font=("Arial", 12))
+        name_label = tk.Label(self.item_frame, text=buff_name, font=("Arial", 10))
+        buff_label = tk.Label(self.item_frame, text=buff_price, font=("Arial", 10))
+        steam_label = tk.Label(self.item_frame, text=steam_price, font=("Arial", 10))
+        diff_label = tk.Label(self.item_frame, text=diff_price, fg=col, font=("Arial", 10))
         image_label = tk.Label(self.item_frame, image=image)
         image_label.image = image
 
         new_row_index = self.item_frame.grid_size()[1] * 2
-        name_label.grid(column=1, row=new_row_index, sticky="w")
-        buff_label.grid(column=2, row=new_row_index+1, sticky="w")
-        steam_label.grid(column=2, row=new_row_index, sticky="w")
-        diff_label.grid(column=1, row=new_row_index+1, sticky="w")
-        image_label.grid(column=0, row=new_row_index, rowspan=2)
+
+        if new_row_index != 0:
+            buffer_label = tk.Label(self.item_frame, bg="#CACACA")
+            buffer_label.config(font=("Arial", 1))
+            buffer_label.grid(column=0, columnspan=3, row=new_row_index, sticky="ew")
+
+
+        name_label.grid(column=1, row=new_row_index+1, sticky="nw", ipady=5, ipadx=5)
+        buff_label.grid(column=2, row=new_row_index+2, sticky="nw")
+        steam_label.grid(column=2, row=new_row_index+1, sticky="nw", ipady=5)
+        diff_label.grid(column=1, row=new_row_index+2, sticky="nw", ipadx=5)
+        image_label.grid(column=0, row=new_row_index+1, rowspan=2, ipady=5)
+        #buffer_label.grid(column=0, columnspan=3, row=new_row_index+2, sticky="ew")
+
 
         self.update()
 
 # TODO viivat tai vastaavat kenttien välille
-# TODO clear-nappi joka tyhjentää gridin
 # TODO scrollwheeli vasemmalle jos mahdollista
+# TODO latausiconi kun itemiä haetaan
 

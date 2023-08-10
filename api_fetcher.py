@@ -56,7 +56,7 @@ class Buff:
         response = requests.get(img_url)
         print(img_url)
         image = Image.open(BytesIO(response.content))
-        image.thumbnail((150, 150), Image.ANTIALIAS)
+        image.thumbnail((100, 100), Image.ANTIALIAS)
         image = ImageTk.PhotoImage(image)
         return image
 
