@@ -73,7 +73,13 @@ class Steam:
         }
         r = requests.get(URL, params=params).json()
 
-        priceEUR = str(r["lowest_price"])
-        priceEUR = priceEUR.replace(',', '.',).replace('-', '0',).replace(' ', '')
-        print(priceEUR)
-        return priceEUR
+        try:
+            priceEUR = str(r["lowest_price"])
+            priceEUR = priceEUR.replace(',', '.', ).replace('-', '0', ).replace(' ', '')
+            return priceEUR
+        except:
+            print("Steam price not found.")
+            priceEUR = "-.---"
+            return priceEUR
+
+

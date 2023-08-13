@@ -19,9 +19,6 @@ class App(tk.Tk):
         self.grid_rowconfigure(2, weight=0)
         self.geometry("1024x576")
 
-        addButton = tk.Button(self, text="Get item", command=self.selected_item)
-        addButton.grid(row=2, column=1, sticky='se')
-
         self.create_skinlist()
         self.init_item_listbox()
         self.create_item_frame()
@@ -40,11 +37,11 @@ class App(tk.Tk):
 
     def init_item_listbox(self):
         # Put the filter in a frame at the top spanning across the columns.
-        frame = tk.Frame(self, width=60)
-        frame.grid(row=0, column=1, columnspan=1, sticky='e')
+        frame = tk.Frame(self)
+        frame.grid(row=0, column=1, columnspan=1, sticky='we', pady=5)
 
-        self.filter_box = tk.Entry(frame, width=60)
-        self.filter_box.pack(side='right', expand=True)
+        self.filter_box = tk.Entry(frame)
+        self.filter_box.pack(side='right', expand=True, fill='x')
         self.listbox = tk.Listbox(self, width=60, height=20)
         self.listbox.grid(row=1, column=1, sticky='nes')
 
@@ -55,6 +52,9 @@ class App(tk.Tk):
 
         # The current filter. Setting it to None initially forces the first update.
         self.curr_filter = None
+
+        add_button = tk.Button(self, text="Get item", command=self.selected_item, width=10)
+        add_button.grid(row=2, column=1, sticky='se', pady=5)
 
     def on_tick(self):
         if self.filter_box.get() != self.curr_filter and self.items:
@@ -88,7 +88,7 @@ class App(tk.Tk):
         self.item_frame.columnconfigure(index=1, weight=1)
         self.item_frame.columnconfigure(index=2, weight=2)
         clear_button = tk.Button(self, text="Clear items", command=self.clear_items)
-        clear_button.grid(row=2, column=0, sticky="w")
+        clear_button.grid(row=2, column=0, sticky="w", pady=5, padx=5)
 
     def clear_items(self):
         for widget in self.item_frame.winfo_children():
@@ -96,16 +96,21 @@ class App(tk.Tk):
 
     def create_singleitem_grid(self, buff_name, buff_price, steam_price, image):
         buff_to_eur = currency_converter.convert_value(buff_price, "CNY", "EUR")
-        eur_diff, percentage_diff = currency_converter.calculate_difference(steam_price, buff_to_eur)
-        if float(eur_diff) <= 0:
-            col = "red"
+        print(steam_price)
+        if steam_price != "-.--":
+            eur_diff, percentage_diff = currency_converter.calculate_difference(steam_price, buff_to_eur)
+            if float(eur_diff) <= 0:
+                col = "red"
+            else:
+                col = "green"
+            diff_price = "Difference in price: " + eur_diff + " € (" + percentage_diff + " %)"
         else:
-            col = "green"
-
+            diff_price = "Difference in price: -"
+            col = "black"
 
         buff_price = "Price in Buff: " + buff_price + " ¥ (" + str(buff_to_eur) + " €)"
         steam_price = "Price in Steam: " + steam_price + "€"
-        diff_price = "Difference in price: " + eur_diff + " € (" + percentage_diff + " %)"
+
 
         name_label = tk.Label(self.item_frame, text=buff_name, font=("Arial", 10))
         buff_label = tk.Label(self.item_frame, text=buff_price, font=("Arial", 10))
@@ -117,7 +122,7 @@ class App(tk.Tk):
         new_row_index = self.item_frame.grid_size()[1] * 2
 
         if new_row_index != 0:
-            buffer_label = tk.Label(self.item_frame, bg="#CACACA")
+            buffer_label = tk.Label(self.item_frame, bg="#E9E9E9")
             buffer_label.config(font=("Arial", 1))
             buffer_label.grid(column=0, columnspan=3, row=new_row_index, sticky="ew")
 
@@ -132,7 +137,10 @@ class App(tk.Tk):
 
         self.update()
 
-# TODO viivat tai vastaavat kenttien välille
+
 # TODO scrollwheeli vasemmalle jos mahdollista
 # TODO latausiconi kun itemiä haetaan
-
+# TODO let capitalization not matter in search bar
+# Bugs:
+# All items not found. e.g. nomad fade minimal wear should exists but it doesnt.
+# Error if item (or price) is not found on buff
