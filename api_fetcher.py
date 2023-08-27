@@ -7,14 +7,34 @@ from io import BytesIO
 with open("config.json", "r") as f:
     config = json.load(f)
 
+
+
+
 class Price:
     def __init__(self):
         self.buff = Buff(config["Cookies"])
         self.steam = Steam()
+        self.i = 1
 
     def fetch_price(self, itemname):
+        with open("config.json", "r") as f:
+            config = json.load(f)
+        currency = config["Currency"]
+        if currency == "USD":
+            self.i = 1
+        elif currency == "GPB":
+            self.i = 2
+        elif currency == "EUR":
+            self.i = 3
+        print(self.i)
+
+
         buff_name, buff_price, image = self.buff.getBuffPrice(itemname)
-        steam_price = self.steam.getSteamPrice(itemname)[:-1]
+        steam_price = self.steam.getSteamPrice(itemname, self.i)
+        if self.i == 3:
+            steam_price = steam_price[:-1]
+        elif self.i == 1:
+            steam_price = steam_price[1:]
         return buff_name, buff_price, steam_price, image
 
 
@@ -65,21 +85,23 @@ class Buff:
 class Steam:
     rate = 1
 
-    def getSteamPrice(self, itemname):
+    def getSteamPrice(self, itemname, i):
         URL = "https://steamcommunity.com/market/priceoverview/?appid=730"
         params = {
-            "currency" : "3",
+            "currency" : i,
             "market_hash_name" : itemname
         }
         r = requests.get(URL, params=params).json()
 
         try:
-            priceEUR = str(r["lowest_price"])
-            priceEUR = priceEUR.replace(',', '.', ).replace('-', '0', ).replace(' ', '')
-            return priceEUR
+            price = str(r["lowest_price"])
+            print(price)
+            price = price.replace(',', '.', ).replace('-', '0', ).replace(' ', '')
+            print(price)
+            return price
         except:
             print("Steam price not found.")
             priceEUR = "-.---"
-            return priceEUR
+            return price
 
 

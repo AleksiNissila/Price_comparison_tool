@@ -4,8 +4,10 @@ import csv
 
 import currency_converter
 import api_fetcher
+import settings
 
 price_fetcher = api_fetcher.Price()
+
 
 class App(tk.Tk):
     def __init__(self):
@@ -43,8 +45,14 @@ class App(tk.Tk):
 
     # TODO implement this
     def init_settings_tab(self, settings_tab):
-        label = tk.Label(settings_tab, text="Settings will go here!")
-        label.pack()
+
+        default_curr, curr_list = settings.get_currency(), settings.get_currency_list()
+        currency_box = tk.ttk.Combobox(settings_tab,state='readonly', textvariable=default_curr)
+        currency_box['values'] = curr_list
+        currency_box.current(curr_list.index(default_curr))
+        currency_box.bind("<<ComboboxSelected>>", lambda event : settings.set_currency(currency_box.get()))
+        currency_box.pack()
+
 
     # TODO implement this
     def init_inventory_tab(self, inventory_tab):
@@ -90,7 +98,7 @@ class App(tk.Tk):
             self.listbox.delete(0, 'end')
 
             for item in self.items:
-                if self.curr_filter in item:
+                if str.lower(self.curr_filter) in str.lower(item):
                     self.listbox.insert('end', item)
 
         self.after(250, self.on_tick)
@@ -120,20 +128,21 @@ class App(tk.Tk):
             widget.destroy()
 
     def create_singleitem_grid(self, price_tab, buff_name, buff_price, steam_price, image):
-        buff_to_eur = currency_converter.convert_value(buff_price, "CNY", "EUR")
+        cny_to_curr = currency_converter.convert_value(buff_price, "CNY", settings.get_currency())
+        print(cny_to_curr)
         print(steam_price)
         if steam_price != "-.--":
-            eur_diff, percentage_diff = currency_converter.calculate_difference(steam_price, buff_to_eur)
-            if float(eur_diff) <= 0:
+            flat_diff, percentage_diff = currency_converter.calculate_difference(steam_price, cny_to_curr)
+            if float(flat_diff) <= 0:
                 col = "red"
             else:
                 col = "green"
-            diff_price = "Difference in price: " + eur_diff + " € (" + percentage_diff + " %)"
+            diff_price = "Difference in price: " + flat_diff + " € (" + percentage_diff + " %)"
         else:
             diff_price = "Difference in price: -"
             col = "black"
 
-        buff_price = "Price in Buff: " + buff_price + " ¥ (" + str(buff_to_eur) + " €)"
+        buff_price = "Price in Buff: " + buff_price + " ¥ (" + str(cny_to_curr) + " €)"
         steam_price = "Price in Steam: " + steam_price + "€"
 
 
@@ -161,6 +170,9 @@ class App(tk.Tk):
 
 
         self.update()
+
+
+
 
 
 # TODO scrollwheeli vasemmalle jos mahdollista
