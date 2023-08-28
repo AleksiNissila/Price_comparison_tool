@@ -9,6 +9,10 @@ import settings
 price_fetcher = api_fetcher.Price()
 
 
+currency= settings.get_currency()[0]
+
+
+
 class App(tk.Tk):
     def __init__(self):
         tk.Tk.__init__(self)
@@ -46,7 +50,7 @@ class App(tk.Tk):
     # TODO implement this
     def init_settings_tab(self, settings_tab):
 
-        default_curr, curr_list = settings.get_currency(), settings.get_currency_list()
+        default_curr, curr_list = settings.get_currency()[0], settings.get_currency_list()
         currency_box = tk.ttk.Combobox(settings_tab,state='readonly', textvariable=default_curr)
         currency_box['values'] = curr_list
         currency_box.current(curr_list.index(default_curr))
@@ -128,7 +132,7 @@ class App(tk.Tk):
             widget.destroy()
 
     def create_singleitem_grid(self, price_tab, buff_name, buff_price, steam_price, image):
-        cny_to_curr = currency_converter.convert_value(buff_price, "CNY", settings.get_currency())
+        cny_to_curr = currency_converter.convert_value(buff_price, "CNY", settings.get_currency()[0])
         print(cny_to_curr)
         print(steam_price)
         if steam_price != "-.--":
@@ -137,13 +141,13 @@ class App(tk.Tk):
                 col = "red"
             else:
                 col = "green"
-            diff_price = "Difference in price: " + flat_diff + " € (" + percentage_diff + " %)"
+            diff_price = f"Difference in price: {currency} {flat_diff} ( {percentage_diff} %)"
         else:
             diff_price = "Difference in price: -"
             col = "black"
 
-        buff_price = "Price in Buff: " + buff_price + " ¥ (" + str(cny_to_curr) + " €)"
-        steam_price = "Price in Steam: " + steam_price + "€"
+        buff_price = f"Price in Buff: {buff_price} ¥ ({currency} {str(cny_to_curr)})"
+        steam_price = f"Price in Steam: {currency} {steam_price}"
 
 
         name_label = tk.Label(self.item_frame, text=buff_name, font=("Arial", 10))

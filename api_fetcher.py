@@ -4,30 +4,17 @@ import json
 from PIL import Image, ImageTk
 from io import BytesIO
 
-with open("config.json", "r") as f:
-    config = json.load(f)
-
-
-
+import settings
 
 class Price:
     def __init__(self):
-        self.buff = Buff(config["Cookies"])
-        self.steam = Steam()
-        self.i = 1
-
-    def fetch_price(self, itemname):
         with open("config.json", "r") as f:
             config = json.load(f)
-        currency = config["Currency"]
-        if currency == "USD":
-            self.i = 1
-        elif currency == "GPB":
-            self.i = 2
-        elif currency == "EUR":
-            self.i = 3
-        print(self.i)
+        self.buff = Buff(config["Cookies"])
+        self.steam = Steam()
+        self.i = config["Currency"][1]
 
+    def fetch_price(self, itemname):
 
         buff_name, buff_price, image = self.buff.getBuffPrice(itemname)
         steam_price = self.steam.getSteamPrice(itemname, self.i)
@@ -74,7 +61,6 @@ class Buff:
     def getItemImage(self, r, i):
         img_url = r["data"]["items"][i]["goods_info"]["original_icon_url"]
         response = requests.get(img_url)
-        print(img_url)
         image = Image.open(BytesIO(response.content))
         image.thumbnail((100, 100), Image.ANTIALIAS)
         image = ImageTk.PhotoImage(image)
@@ -95,9 +81,7 @@ class Steam:
 
         try:
             price = str(r["lowest_price"])
-            print(price)
             price = price.replace(',', '.', ).replace('-', '0', ).replace(' ', '')
-            print(price)
             return price
         except:
             print("Steam price not found.")
