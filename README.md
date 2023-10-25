@@ -5,4 +5,4 @@ Very much Work-in-Progress.
 
 GUI tool for fetching and comparing prices from buff.163.com and steamcommunity.com. 
 
-Buff requires logging in to get price information, so the tool needs browser cookies for Buff in order to work.
+Buff requires logging in to get price information, so the tool needs browser cookies for Buff pasted in the config.json file in order to work.
