@@ -17,7 +17,7 @@ while(True):
             break
     except TypeError: # because of rate limits, api will return nothing after a certain point.
         #So you can either change the start value, or add a sleep function of a certain time, and then run again.
-        skinList.to_csv('csv/list6.csv', index=False, header=False)
+        skinList.to_csv('csv/list_stickers_2.csv', index=False, header=False)
         print("error here at " + str(start))
         break
-skinList.to_csv('csv/list6.csv', index=False, header=False)
+skinList.to_csv('csv/list_stickers_2.csv', index=False, header=False)

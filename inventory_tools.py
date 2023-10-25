@@ -5,6 +5,15 @@ class Inventory:
         self.aaa = 0
 
     def addItem(self, id, name, amount, date, buy_price):
+        """
+        Function for adding an item to inventory.json
+        :param id: Id for the item
+        :param name: Name for the item
+        :param amount: Amount of the item
+        :param date: Date for the item (e.g. when it was bought)
+        :param buy_price: Initial price for the item
+        :return: nothing
+        """
         new_item = {"itemId" : id,
                     "name" : name,
                     "amount" : amount,
@@ -22,6 +31,11 @@ class Inventory:
         pass
 
     def deleteItem(self, id):
+        """
+        Function for deleting an item from inventory.json
+        :param id: Id for the item in the JSON-file
+        :return: nothing
+        """
         with open("inventory.json", "r+") as inv:
             inv_json = json.load(inv)
 

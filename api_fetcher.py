@@ -15,9 +15,14 @@ class Price:
         self.i = config["Currency"][1]
 
     def fetch_price(self, itemname):
-
+        """
+        Function for getting prices from both Steam and Buff. Calls 2 different functions for getting prices from both
+        :param itemname: Item name to be searched from Steam and Buff
+        :return: Full name of item, price from Buff, price from Steam and image of the item
+        """
         buff_name, buff_price, image = self.buff.getBuffPrice(itemname)
         steam_price = self.steam.getSteamPrice(itemname, self.i)
+        # Price depending on currency
         if self.i == 3:
             steam_price = steam_price[:-1]
         elif self.i == 1:
@@ -31,6 +36,11 @@ class Buff:
             "Cookie": str(header)
         }
     def getBuffPrice(self, itemname):
+        """
+        Get price of an item from Buff API https://buff.163.com/api/market/goods?game=csgo
+        :param itemname: Name of item to be searched for
+        :return: Full name of item, price in Renmibi (Buff default currency), image of the item
+        """
         try:
             URL = "https://buff.163.com/api/market/goods?"
             params = {
@@ -59,6 +69,12 @@ class Buff:
             return "noname", 0
 
     def getItemImage(self, r, i):
+        """
+        Function for getting an image from URL
+        :param r: json file containing information about an item
+        :param i: id of the correct item inside the json
+        :return: image of the item
+        """
         img_url = r["data"]["items"][i]["goods_info"]["original_icon_url"]
         response = requests.get(img_url)
         image = Image.open(BytesIO(response.content))
@@ -72,6 +88,12 @@ class Steam:
     rate = 1
 
     def getSteamPrice(self, itemname, i):
+        """
+        Get price of an item from Steam API , e.g. https://steamcommunity.com/market/priceoverview/
+        :param itemname: Name of item to be searched for
+        :param i: Currency used for the search (1 = $, 2 = £, 3 = €)
+        :return: Price for the item from Steam
+        """
         URL = "https://steamcommunity.com/market/priceoverview/?appid=730"
         params = {
             "currency" : i,

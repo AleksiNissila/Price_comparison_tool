@@ -72,7 +72,12 @@ def convert_value(value, fromRate, toRate):
     return converted_value
 
 def calculate_difference(steam_val, buff_val):
-
+    """
+    Function for calculating difference in price between 2 prices
+    :param steam_val: First price
+    :param buff_val: Second price
+    :return: Flat difference, and difference as a percentage
+    """
     steam_val, buff_val = float(steam_val), float(buff_val)
     eur_diff = steam_val - buff_val
     percentage_diff = (eur_diff / steam_val) * 100
